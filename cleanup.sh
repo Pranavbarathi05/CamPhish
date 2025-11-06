@@ -44,6 +44,11 @@ rm -f Log.log
 rm -f *.log
 rm -f *.txt
 
+# Truncate (clear) specific cloudfare files if present, or create empty ones
+echo "Truncating cloudfare files (cloudfare.log, cloudfare)..."
+:> cloudfare.log
+:> cloudfare
+
 # Remove cloudflared binary and related files if present
 echo "Removing cloudflared binaries and archives..."
 rm -f cloudflared
