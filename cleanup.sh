@@ -4,10 +4,13 @@
 
 echo "Starting cleanup of unnecessary files and logs..."
 
-# Remove log files
-echo "Removing log files..."
-rm -f *.log
+# Remove log files in repo root (and specific known logs)
+echo "Removing top-level log files..."
 rm -f .cloudflared.log
+
+# Remove all .log files recursively (exclude .git directory)
+echo "Removing all .log files recursively (excluding .git)..."
+find . -type f -name "*.log" -not -path "./.git/*" -print -exec rm -f {} + || true
 
 # Remove any text files in the repo root (temporary markers, saved IPs, etc.)
 echo "Removing text files..."
@@ -40,14 +43,12 @@ rm -f LocationLog.log
 rm -f LocationError.log
 rm -f Log.log
 
-# Also remove any remaining .log or .txt files (catch-all)
-rm -f *.log
+# Also remove any remaining top-level .txt files (catch-all)
 rm -f *.txt
 
-# Truncate (clear) specific cloudfare files if present, or create empty ones
-echo "Truncating cloudfare files (cloudfare.log, cloudfare)..."
-:> cloudfare.log
-:> cloudfare
+# Remove specific cloudfare files if present
+echo "Removing cloudfare files (cloudfare.log, cloudfare) if present..."
+rm -f cloudfare.log cloudfare || true
 
 # Remove cloudflared binary and related files if present
 echo "Removing cloudflared binaries and archives..."
