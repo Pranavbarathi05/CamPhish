@@ -305,6 +305,19 @@ payload_cloudflare() {
   else
     sed 's+forwarding_link+'$link'+g' dummy_template.html > index.php
   fi
+
+  # If user chose not to request location (option 3), override any tryGetLocation()
+  # function in the generated page to avoid triggering the browser location prompt.
+  if [[ "$acquire_location" == "3" ]]; then
+    cat >> index.php <<'EOF'
+<script>
+  // Location acquisition disabled by server-side option; stub out function
+  function tryGetLocation(){
+    return Promise.resolve(false);
+  }
+</script>
+EOF
+  fi
 }
 
 camphish() {
