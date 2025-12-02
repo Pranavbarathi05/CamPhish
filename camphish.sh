@@ -169,9 +169,27 @@ done
 }
 
 cloudflare_tunnel() {
-if [[ -s cloudflared ]] || [[ -s cloudflared.exe ]]; then
-  # cloudflared binary exists and is non-empty — assume usable
-  echo ""
+VALID_CLOUDFLARED=false
+if [[ -f cloudflared ]]; then
+  if file cloudflared 2>/dev/null | grep -qi "elf"; then
+    VALID_CLOUDFLARED=true
+  else
+    echo "Found existing 'cloudflared' but it's not a valid binary — will re-download."
+    rm -f cloudflared
+  fi
+fi
+
+if [[ -f cloudflared.exe ]]; then
+  if file cloudflared.exe 2>/dev/null | grep -qi "pe32\|msdos"; then
+    VALID_CLOUDFLARED=true
+  else
+    echo "Found existing 'cloudflared.exe' but it's not a valid Windows binary — will re-download."
+    rm -f cloudflared.exe
+  fi
+fi
+
+if [[ "$VALID_CLOUDFLARED" == true ]]; then
+  echo "Found valid cloudflared binary, skipping download."
 else
 command -v unzip > /dev/null 2>&1 || { echo >&2 "I require unzip but it's not installed. Install it. Aborting."; exit 1; }
 command -v wget > /dev/null 2>&1 || { echo >&2 "I require wget but it's not installed. Install it. Aborting."; exit 1; }
